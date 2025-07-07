@@ -21,6 +21,7 @@ enum class EOscWReceiveMsgType: uint8
 	FVector,
 	ByteArray
 };
+
 USTRUCT(BlueprintType, Category = "OscWingman")
 struct FOscWOutMsg
 {
@@ -41,13 +42,14 @@ struct FOscWOutMsg
 };
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOscWMsgReceivedBP, FOscWOutMsg, Out);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOscWMsgReceived, FOscWOutMsg, Out);
 
 /**
  * 
  */
 UCLASS()
-class OSCWINGMAN_API UOscWMsgSubsystem : public UEngineSubsystem 
+class OSCWINGMAN_API UOscWMsgSubsystem : public UEngineSubsystem
 {
 	GENERATED_BODY()
 
@@ -60,11 +62,23 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "OSC")
 	TObjectPtr<UOSCServer> TheOSCServer;
 
+private:
 	UFUNCTION(BlueprintCallable, Category = "OSC")
 	void BindEventToOnOSCReceiveMessage(EOscWReceiveMsgType InMsgType, FString InAddress, const FOscWMsgReceivedBP& Received);
 
-private:
 	UPROPERTY()
 	TMap<FGuid, FOscWMsgReceived> ReceivedMessages;
-	
+
+	friend class UOscWMsgBPLibrary;
+};
+
+UCLASS()
+class OSCWINGMAN_API UOscWMsgBPLibrary : public UBlueprintFunctionLibrary
+{
+	GENERATED_BODY()
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "OSC")
+	static void BindEventToOscWingmanReceiveMessage(EOscWReceiveMsgType InMsgType, FString InAddress, const FOscWMsgReceivedBP& Received);
+
 };

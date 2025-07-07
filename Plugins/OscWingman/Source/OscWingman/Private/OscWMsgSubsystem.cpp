@@ -119,9 +119,20 @@ void UOscWMsgSubsystem::BindEventToOnOSCReceiveMessage(EOscWReceiveMsgType InMsg
 				}
 				case EOscWReceiveMsgType::ByteArray:
 					break;
+				case EOscWReceiveMsgType::None:
+					break;
 			}
 
 			Recv->Broadcast(OutMsg);
 		}
 	});
+}
+
+void UOscWMsgBPLibrary::BindEventToOscWingmanReceiveMessage(EOscWReceiveMsgType InMsgType, FString InAddress, const FOscWMsgReceivedBP& Received)
+{
+	auto OSC = GEngine->GetEngineSubsystem<UOscWMsgSubsystem>();
+	if (OSC)
+	{
+		OSC->BindEventToOnOSCReceiveMessage(InMsgType, InAddress, Received);
+	}
 }
