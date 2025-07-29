@@ -6,21 +6,41 @@
 #include "OSCManager.h"
 #include "OSCServer.h"
 
+
 void UOscWMsgSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
 	if (!TheOSCServer)
 	{
-		TheOSCServer = UOSCManager::CreateOSCServer("", 13442, false, true, TEXT("OscWingmanSrv"), this);
+		CreateServer();
 	}
+
+	IConsoleVariable* OscPort = IConsoleManager::Get().FindConsoleVariable(TEXT("oscw.Server.Port"));
+
+	OscPort->SetOnChangedCallback(FConsoleVariableDelegate::CreateUObject(this, &UOscWMsgSubsystem::OnPortVarChanged));
 }
 
-void UOscWMsgSubsystem::Deinitialize()
+void UOscWMsgSubsystem::CreateServer()
 {
-	Super::Deinitialize();
+	auto PortVar = IConsoleManager::Get().FindConsoleVariable(TEXT("oscw.Server.Port"));
+	// UE_LOG(LogTemp, Warning, TEXT("Creating OSC Server Port:%d"), PortVar->GetInt());
 
+	TheOSCServer = UOSCManager::CreateOSCServer("", PortVar->GetInt(), false, true, TEXT("OscWingmanSrv"), this);
 }
+
+void UOscWMsgSubsystem::RecreateServer()
+{
+	auto OldServerBind = TheOSCServer->OnOscMessageReceivedNative;
+	CreateServer();
+	TheOSCServer->OnOscMessageReceivedNative = OldServerBind;
+}
+
+void UOscWMsgSubsystem::OnPortVarChanged(IConsoleVariable* CVar)
+{
+	RecreateServer();
+}
+
 
 void UOscWMsgSubsystem::Reset()
 {
@@ -89,33 +109,33 @@ void UOscWMsgSubsystem::BindEventToOnOSCReceiveMessage(EOscWReceiveMsgType InMsg
 				case EOscWReceiveMsgType::FVector:
 				{
 					TArray<float> TempVec2;
-				   UOSCManager::GetAllFloats(InMsg, TempVec2);
+					UOSCManager::GetAllFloats(InMsg, TempVec2);
 
-				   TArray<FVector> Result2;
-				   const int32     TotalFloats2 = TempVec2.Num();
-				   // 确保浮点数数量是3的倍数
-				   if (TotalFloats2 % 3 != 0)
-				   {
-					   UE_LOG(LogTemp, Warning, TEXT("Float array size is not a multiple of 3!"));
-					   return;
-				   }
+					TArray<FVector> Result2;
+					const int32     TotalFloats2 = TempVec2.Num();
+					// 确保浮点数数量是3的倍数
+					if (TotalFloats2 % 3 != 0)
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Float array size is not a multiple of 3!"));
+						return;
+					}
 
-				   // 预分配内存提高性能
-				   Result2.Reserve(TotalFloats2 / 3);
+					// 预分配内存提高性能
+					Result2.Reserve(TotalFloats2 / 3);
 
-				   // 每3个float转换成一个FVector
-				   for (int32 i = 0; i < TotalFloats2; i += 3)
-				   {
-					   Result2.Add(FVector(
-						   TempVec2[i],     // X
-						   TempVec2[i + 1], // Y
-						   TempVec2[i + 2]  // Z
-						   ));
-				   }
+					// 每3个float转换成一个FVector
+					for (int32 i = 0; i < TotalFloats2; i += 3)
+					{
+						Result2.Add(FVector(
+							TempVec2[i],     // X
+							TempVec2[i + 1], // Y
+							TempVec2[i + 2]  // Z
+							));
+					}
 
-				   OutMsg.Vector = Result2;
+					OutMsg.Vector = Result2;
 
-				   break;
+					break;
 				}
 				case EOscWReceiveMsgType::ByteArray:
 					break;

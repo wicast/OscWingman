@@ -55,7 +55,6 @@ class OSCWINGMAN_API UOscWMsgSubsystem : public UEngineSubsystem
 
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
-	virtual void Deinitialize() override;
 
 	void Reset();
 
@@ -65,6 +64,10 @@ public:
 private:
 	UFUNCTION(BlueprintCallable, Category = "OSC")
 	void BindEventToOnOSCReceiveMessage(EOscWReceiveMsgType InMsgType, FString InAddress, const FOscWMsgReceivedBP& Received);
+	void CreateServer();
+	void RecreateServer();
+
+	void OnPortVarChanged(IConsoleVariable* CVar);
 
 	UPROPERTY()
 	TMap<FGuid, FOscWMsgReceived> ReceivedMessages;
