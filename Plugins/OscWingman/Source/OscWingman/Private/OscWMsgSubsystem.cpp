@@ -10,14 +10,19 @@
 void UOscWMsgSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
+	IConsoleManager& ConsoleManager = IConsoleManager::Get();
+	if(!ConsoleManager.FindConsoleVariable(TEXT("oscw.Server.Enabled"))->GetBool())
+	{
+		return;
+	}
 
 	if (!TheOSCServer)
 	{
 		CreateServer();
 	}
 
-	IConsoleVariable* OscPort = IConsoleManager::Get().FindConsoleVariable(TEXT("oscw.Server.Port"));
 
+	IConsoleVariable* OscPort = ConsoleManager.FindConsoleVariable(TEXT("oscw.Server.Port"));
 	OscPort->SetOnChangedCallback(FConsoleVariableDelegate::CreateUObject(this, &UOscWMsgSubsystem::OnPortVarChanged));
 }
 
@@ -38,18 +43,31 @@ void UOscWMsgSubsystem::RecreateServer()
 
 void UOscWMsgSubsystem::OnPortVarChanged(IConsoleVariable* CVar)
 {
+	if (!IsUsable())
+	{
+		return;
+	}
 	RecreateServer();
 }
 
 
 void UOscWMsgSubsystem::Reset()
 {
+	if (!IsUsable())
+	{
+		return;
+	}
 	TheOSCServer->UnbindAllEventsFromOnOSCAddressPatternMatching();
 	ReceivedMessages.Empty();
 }
 
 void UOscWMsgSubsystem::BindEventToOnOSCReceiveMessage(EOscWReceiveMsgType InMsgType, FString InAddress, const FOscWMsgReceivedBP& Received)
 {
+	if (!IsUsable())
+	{
+		return;
+	}
+
 	FOscWMsgReceived NativeReceived;
 	NativeReceived.AddUnique(Received);
 	FGuid NewUUID = FGuid::NewGuid(); // 生成随机 UUID
@@ -146,6 +164,13 @@ void UOscWMsgSubsystem::BindEventToOnOSCReceiveMessage(EOscWReceiveMsgType InMsg
 			Recv->Broadcast(OutMsg);
 		}
 	});
+}
+
+bool UOscWMsgSubsystem::IsUsable()
+{
+	IConsoleManager& ConsoleManager = IConsoleManager::Get();
+	return ConsoleManager.FindConsoleVariable(TEXT("oscw.Server.Enabled"))->GetBool()
+		&& TheOSCServer != nullptr;
 }
 
 void UOscWMsgBPLibrary::BindEventToOscWingmanReceiveMessage(EOscWReceiveMsgType InMsgType, FString InAddress, const FOscWMsgReceivedBP& Received)

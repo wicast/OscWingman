@@ -6,11 +6,6 @@
 #include "Engine/DeveloperSettingsBackedByCVars.h"
 #include "OscWSettings.generated.h"
 
-namespace OscWConsoleVariables
-{
-	static int32 OscWServerPort = 13442;
-}
-
 /**
  * 
  */
@@ -18,7 +13,10 @@ UCLASS(Config=EditorPerProjectUserSettings, defaultconfig, meta = (DisplayName="
 class OSCWINGMAN_API UOscWSettings : public UDeveloperSettingsBackedByCVars
 {
 	GENERATED_BODY()
+
 public:
+	UPROPERTY(config, EditAnywhere, Category=General, meta=(ConsoleVariable="oscw.Server.Enabled", ConfigRestartRequired = true))
+	bool bEnabled;
 	UPROPERTY(config, EditAnywhere, Category=General, meta=(ConsoleVariable="oscw.Server.Port"))
 	int32 Port;
 

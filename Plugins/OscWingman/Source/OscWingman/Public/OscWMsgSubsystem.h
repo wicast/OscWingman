@@ -58,6 +58,9 @@ public:
 
 	void Reset();
 
+	UFUNCTION(BlueprintCallable, Category = "OscWingman")
+	bool IsUsable();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "OSC")
 	TObjectPtr<UOSCServer> TheOSCServer;
 

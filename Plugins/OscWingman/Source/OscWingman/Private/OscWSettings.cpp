@@ -7,6 +7,13 @@
 
 namespace OscWConsoleVariables
 {
+	static bool bOscWServerEnabled = false;
+	static FAutoConsoleVariableRef CVarOscWServerEnabled(
+			TEXT("oscw.Server.Enabled"),
+			bOscWServerEnabled,
+			TEXT("Is Osc Wingman server enabled"));
+	
+	static int32 OscWServerPort = 13442;
 	static FAutoConsoleVariableRef CVarOscWServerPort(
 		TEXT("oscw.Server.Port"),
 		OscWServerPort,
