@@ -3,6 +3,7 @@
 
 #include "OscWSettings.h"
 
+#include "HAL/IConsoleManager.h"
 #include "Misc/ConfigUtilities.h"
 
 namespace OscWConsoleVariables

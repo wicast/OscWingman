@@ -4,6 +4,7 @@
 #include "OscWMsgGarbageCollector.h"
 
 #include "OscWMsgSubsystem.h"
+#include "Engine/Engine.h"
 
 void UOscWMsgGarbageCollector::Deinitialize()
 {

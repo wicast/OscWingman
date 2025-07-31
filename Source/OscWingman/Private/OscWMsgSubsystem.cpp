@@ -1,10 +1,11 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "OscWMsgSubsystem.h"
 
 #include "OSCManager.h"
 #include "OSCServer.h"
+#include "Engine/Engine.h"
 
 
 void UOscWMsgSubsystem::Initialize(FSubsystemCollectionBase& Collection)

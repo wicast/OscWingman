@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "OSCServer.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
+#include "Subsystems/EngineSubsystem.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "OscWMsgSubsystem.generated.h"
 
