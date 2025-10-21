@@ -7,13 +7,14 @@ public class OscWingman : ModuleRules
 	public OscWingman(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		
+
 		PublicIncludePaths.AddRange(
 			new string[] {
 				// ... add public include paths required here ...
 			}
 			);
-				
+		
+		//PublicDefinitions.Add("OSCW_FORCE_ENABLED");
 		
 		PrivateIncludePaths.AddRange(
 			new string[] {

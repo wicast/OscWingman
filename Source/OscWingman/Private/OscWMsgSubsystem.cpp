@@ -7,12 +7,20 @@
 #include "OSCServer.h"
 #include "Engine/Engine.h"
 
+#ifdef OSCW_FORCE_ENABLED
+	const bool bOSCWForceEnabled = true;
+#else
+	const bool bOSCWForceEnabled = false;
+#endif
+
 
 void UOscWMsgSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 	IConsoleManager& ConsoleManager = IConsoleManager::Get();
-	if(!ConsoleManager.FindConsoleVariable(TEXT("oscw.Server.Enabled"))->GetBool())
+
+
+	if(!ConsoleManager.FindConsoleVariable(TEXT("oscw.Server.Enabled"))->GetBool() && !bOSCWForceEnabled)
 	{
 		return;
 	}
@@ -30,7 +38,7 @@ void UOscWMsgSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 void UOscWMsgSubsystem::CreateServer()
 {
 	auto PortVar = IConsoleManager::Get().FindConsoleVariable(TEXT("oscw.Server.Port"));
-	// UE_LOG(LogTemp, Warning, TEXT("Creating OSC Server Port:%d"), PortVar->GetInt());
+	UE_LOG(LogTemp, Warning, TEXT("Creating OSC Server Port:%d"), PortVar->GetInt());
 
 	TheOSCServer = UOSCManager::CreateOSCServer("", PortVar->GetInt(), false, true, TEXT("OscWingmanSrv"), this);
 }
@@ -165,12 +173,13 @@ void UOscWMsgSubsystem::BindEventToOnOSCReceiveMessage(EOscWReceiveMsgType InMsg
 			Recv->Broadcast(OutMsg);
 		}
 	});
+	// UE_LOG(LogTemp, Warning, TEXT("BindEventToOnOSCReceiveMessage %s"), *InAddress)
 }
 
 bool UOscWMsgSubsystem::IsUsable()
 {
 	IConsoleManager& ConsoleManager = IConsoleManager::Get();
-	return ConsoleManager.FindConsoleVariable(TEXT("oscw.Server.Enabled"))->GetBool()
+	return (ConsoleManager.FindConsoleVariable(TEXT("oscw.Server.Enabled"))->GetBool() || bOSCWForceEnabled)
 		&& TheOSCServer != nullptr;
 }
 
