@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "OscWMsgSubsystem.h"
@@ -40,7 +40,7 @@ void UOscWMsgSubsystem::CreateServer()
 	auto PortVar = IConsoleManager::Get().FindConsoleVariable(TEXT("oscw.Server.Port"));
 	UE_LOG(LogTemp, Warning, TEXT("Creating OSC Server Port:%d"), PortVar->GetInt());
 
-	TheOSCServer = UOSCManager::CreateOSCServer("", PortVar->GetInt(), false, true, TEXT("OscWingmanSrv"), this);
+	TheOSCServer = UOSCManager::CreateOSCServer(TEXT("0.0.0.0"), PortVar->GetInt(), false, true, TEXT("OscWingmanSrv"), this);
 }
 
 void UOscWMsgSubsystem::RecreateServer()
